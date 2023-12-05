@@ -2,8 +2,6 @@
 
 load("//third_party/android:android_configure.bzl", "android_configure")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
-load("@com_google_benchmark//:bazel/benchmark_deps.bzl", "benchmark_deps")
 load("@io_bazel_rules_closure//closure:defs.bzl", "closure_repositories")
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
@@ -14,7 +12,6 @@ def workspace(with_rules_cc = True):
     Args:
       with_rules_cc: Unused, to be removed soon.
     """
-    native.register_toolchains("@local_config_python//:py_toolchain")
     rules_pkg_dependencies()
 
     closure_repositories()
@@ -30,9 +27,6 @@ def workspace(with_rules_cc = True):
     )
 
     android_configure(name = "local_config_android")
-
-    grpc_deps()
-    benchmark_deps()
 
 # Alias so it can be loaded without assigning to a different symbol to prevent
 # shadowing previous loads and trigger a buildifier warning.

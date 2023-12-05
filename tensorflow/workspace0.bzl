@@ -6,9 +6,7 @@ load("@bazel_toolchains//repositories:repositories.bzl", bazel_toolchains_reposi
 load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
 load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
 load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
-load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 load("@local_config_android//:android.bzl", "android_workspace")
-load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 
 def _tf_bind():
     """Bind targets for some external repositories"""
@@ -27,16 +25,6 @@ def _tf_bind():
     native.bind(
         name = "grpc_python_plugin",
         actual = "@com_github_grpc_grpc//src/compiler:grpc_python_plugin",
-    )
-
-    native.bind(
-        name = "grpc_lib",
-        actual = "@com_github_grpc_grpc//:grpc++",
-    )
-
-    native.bind(
-        name = "grpc_lib_unsecure",
-        actual = "@com_github_grpc_grpc//:grpc++_unsecure",
     )
 
     # Needed by Protobuf
@@ -107,20 +95,6 @@ def workspace():
 
     bazel_toolchains_repositories()
 
-    # Apple rules for Bazel. https://github.com/bazelbuild/rules_apple.
-    # Note: We add this to fix Kokoro builds.
-    # The rules below call into `rules_proto` but the hash has changed and
-    # Bazel refuses to continue. So, we add our own mirror.
-    http_archive(
-        name = "rules_proto",
-        sha256 = "20b240eba17a36be4b0b22635aca63053913d5c1ee36e16be36499d167a2f533",
-        strip_prefix = "rules_proto-11bf7c25e666dd7ddacbcd4d4c4a9de7a25175f8",
-        urls = [
-            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/bazelbuild/rules_proto/archive/11bf7c25e666dd7ddacbcd4d4c4a9de7a25175f8.tar.gz",
-            "https://github.com/bazelbuild/rules_proto/archive/11bf7c25e666dd7ddacbcd4d4c4a9de7a25175f8.tar.gz",
-        ],
-    )
-
     # Now, finally use the rules
     apple_rules_dependencies()
     swift_rules_dependencies()
@@ -132,8 +106,6 @@ def workspace():
     # at the end of the WORKSPACE file.
     _tf_bind()
 
-    grpc_extra_deps()
-    rules_foreign_cc_dependencies()
     config_googleapis()
 
 # Alias so it can be loaded without assigning to a different symbol to prevent
